@@ -28,6 +28,11 @@ function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState<string>("");
 
+  const onWriteTask = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setNewTask(value);
+  };
+
   const fetchList = async () => {
     if (!account) return [];
     try {
@@ -39,7 +44,7 @@ function App() {
       );
       setAccountHasList(true);
 
-      // task table handle
+      // tasks table handle
       const tableHandle = (todoListResource as any).tasks.handle;
       // tasks table counter
       const taskCounter = (todoListResource as any).task_counter;
@@ -57,7 +62,7 @@ function App() {
         counter++;
       }
 
-      // set taks in local state
+      // set tasks in local state
       setTasks(tasks);
     } catch (e: any) {
       setAccountHasList(false);
@@ -69,7 +74,7 @@ function App() {
     setTransactionInProgress(true);
     const transaction: InputTransactionData = {
       data: {
-        function: `${moduleAddress}::todoList::create_list`, 
+        function: `${moduleAddress}::todolist::create_list`, 
         functionArguments: []
       }
     };
@@ -84,11 +89,6 @@ function App() {
     } finally {
       setTransactionInProgress(false);
     }
-  };
-
-  const onWriteTask = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setNewTask(value);
   };
 
   const onTaskAdded = async () => {
@@ -135,10 +135,7 @@ function App() {
     }
   };
 
-  const onCheckboxChange = async (
-    event: CheckboxChangeEvent, 
-    taskId: string
-  ) => {
+  const onCheckboxChange = async (event: CheckboxChangeEvent, taskId: string) => {
     if (!account) return;
     if (!event.target.checked) return;
     setTransactionInProgress(true);
@@ -211,43 +208,35 @@ function App() {
             <Col span={8} offset={8}>
               <Input.Group compact>
                 <Input
-                onChange={(event) => onWriteTask(event)}
-                  style={{ width: "calc(100% - 60px" }}
+                  onChange={(event) => onWriteTask(event)}
+                  style={{ width: "calc(100% - 60px)" }}
                   placeholder="Add a Task"
                   size="large"
                   value={newTask}
                 />
-                <Button
-                  onClick={onTaskAdded}
-                  type="primary"
-                  style={{ height: "40px", backgroundColor: "3f67ff" }}
-                >
+                <Button onClick={onTaskAdded} type="primary" style={{ height: "40px", backgroundColor: "#3f67ff" }}>
                   Add
                 </Button>
               </Input.Group>
             </Col>
-            <Col>
+            <Col span={8} offset={8}>
               {tasks && (
                 <List
                   size="small"
                   bordered
                   dataSource={tasks}
-                  renderItem={(task: any) => (
-                    <List.Item 
+                  renderItem={(task: Task) => (
+                    <List.Item
                       actions={[
                         <div>
                           {task.completed ? (
                             <Checkbox defaultChecked={true} disabled />
                           ) : (
-                            <Checkbox 
-                              onChange={(event) => 
-                                onCheckboxChange(event, task.task_id)
-                              }
-                            />
+                            <Checkbox onChange={(event) => onCheckboxChange(event, task.task_id)} />
                           )}
                         </div>,
-                      <Checkbox onChange={(event) => onCheckboxChange(event, task.task_id)} />
-                    ]}>
+                      ]}
+                    >
                       <List.Item.Meta
                         title={task.content}
                         description={

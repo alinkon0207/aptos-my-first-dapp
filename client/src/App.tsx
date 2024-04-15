@@ -1,18 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Row, Col, Button, Spin, Input, List, Checkbox } from "antd";
-import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design";
-import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
-import { 
-  useWallet, 
-  InputTransactionData, 
-} from "@aptos-labs/wallet-adapter-react";
-import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
+import { Layout, Row, Col, Button, Spin, Input, List, Checkbox } from "antd";
 
-const aptosConfig = new AptosConfig({ network: Network.MAINNET });
-const aptos = new Aptos(aptosConfig);
-// change this to be your module account address
-const moduleAddress = "0xe16ee3557835f7ea5f5dbd7cb2fd89902afe812c59434289d0fd494650a00a61";
+import React, { useState, useEffect } from 'react';
+import { useWallet, InputTransactionData } from "@aptos-labs/wallet-adapter-react";
+
+import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
+import { CheckboxChangeEvent } from "antd/es/checkbox";
+import { Aptos } from "@aptos-labs/ts-sdk";
 
 type Task = {
   address: string;
@@ -21,12 +15,16 @@ type Task = {
   task_id: string;
 };
 
+const aptos = new Aptos();
+// change this to be your module account address
+const moduleAddress = "0xe16ee3557835f7ea5f5dbd7cb2fd89902afe812c59434289d0fd494650a00a61";
+
 function App() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTask, setNewTask] = useState<string>("");
   const { account, signAndSubmitTransaction } = useWallet();
   const [accountHasList, setAccountHasList] = useState<boolean>(false);
   const [transactionInProgress, setTransactionInProgress] = useState<boolean>(false);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [newTask, setNewTask] = useState<string>("");
 
   const onWriteTask = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -45,9 +43,9 @@ function App() {
       setAccountHasList(true);
 
       // tasks table handle
-      const tableHandle = (todoListResource as any).tasks.handle;
+      const tableHandle = (todoListResource as any).data.tasks.handle;
       // tasks table counter
-      const taskCounter = (todoListResource as any).task_counter;
+      const taskCounter = (todoListResource as any).data.task_counter;
 
       let tasks = [];
       let counter = 1;
